@@ -11,7 +11,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { User } from '../types/json-placeholder-data';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Button } from '@mui/material';
-import UserDetailsForm from '../context/components/userDetailsForm';
+import UserDetailsForm from '../components/userDetailsForm';
 
 const Example = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
