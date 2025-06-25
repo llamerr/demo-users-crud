@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -11,8 +11,11 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { User } from '../types/json-placeholder-data';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Button } from '@mui/material';
+import UserDetailsForm from '../context/components/userDetailsForm';
 
 const Example = () => {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   const { 
     data, 
     isError, 
@@ -67,9 +70,18 @@ const Example = () => {
     columns,
     data: data ?? [],
     initialState: { showColumnFilters: true },
-    manualFiltering: true, //turn off built-in client-side filtering
-    manualPagination: true, //turn off built-in client-side pagination
-    manualSorting: true, //turn off built-in client-side sorting
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: () => setSelectedUser(row.original),
+      sx: {
+        cursor: 'pointer',
+        '&:hover': {
+          backgroundColor: 'rgba(0, 0, 0, 0.04)',
+        },
+      },
+    }),
     muiToolbarAlertBannerProps: isError
       ? {
           color: 'error',
@@ -96,12 +108,17 @@ const Example = () => {
     },
   });
 
-  return <>
+  return (
     <PageContainer>
       <Button onClick={() => setIsBroken(!isBroken)}>{isBroken ? 'Fix' : 'Break'} the data</Button>
       <MaterialReactTable table={table} />
+      <UserDetailsForm 
+        open={!!selectedUser} 
+        onClose={() => setSelectedUser(null)} 
+        user={selectedUser} 
+      />
     </PageContainer>
-  </>;
+  );
 };
 
 export default Example;
