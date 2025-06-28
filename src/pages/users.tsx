@@ -1,19 +1,55 @@
-import { useMemo, useState } from 'react';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Button } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import { PageContainer } from '@toolpad/core/PageContainer';
 import {
   MaterialReactTable,
-  useMaterialReactTable,
   type MRT_ColumnDef,
+  useMaterialReactTable,
 } from 'material-react-table';
-import { useFetchUsers } from '../data/useFetchUsers';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { User } from '../types/json-placeholder-data';
-import { PageContainer } from '@toolpad/core/PageContainer';
-import { Button } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+
 import UserDetailsForm from '../components/userDetailsForm';
+import { useFetchUsers } from '../data/useFetchUsers';
+import type { User } from '../types/json-placeholder-data';
+
+const columnsSettings = [
+  {
+    accessorKey: 'name',
+    header: 'Full Name',
+    size: 150,
+    enableColumnFilter: true,
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+    size: 150,
+    enableColumnFilter: true,
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'username',
+    header: 'Username',
+    size: 200,
+    enableColumnFilter: false,
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'company.name',
+    header: 'Company',
+    size: 150,
+    enableColumnFilter: false,
+    enableSorting: false,
+  },
+];
 
 const Example = () => {
+  const navigate = useNavigate();
+  const { userId } = useParams<{ userId: string }>();
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const { 
@@ -32,37 +68,15 @@ const Example = () => {
     setIsBroken,
   } = useFetchUsers();
 
+  useEffect(() => {
+    if (userId) {
+      const user = data?.find((user) => user.id === Number(userId));
+      setSelectedUser(user || null);
+    }
+  }, [userId, data]);
+
   const columns = useMemo<MRT_ColumnDef<User>[]>(
-    () => [
-      {
-        accessorKey: 'name',
-        header: 'Full Name',
-        size: 150,
-        enableColumnFilter: true,
-        enableSorting: true,
-      },
-      {
-        accessorKey: 'email',
-        header: 'Email',
-        size: 150,
-        enableColumnFilter: true,
-        enableSorting: true,
-      },
-      {
-        accessorKey: 'username',
-        header: 'Username',
-        size: 200,
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        accessorKey: 'company.name',
-        header: 'Company',
-        size: 150,
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-    ],
+    () => columnsSettings,
     [],
   );
 
@@ -74,7 +88,10 @@ const Example = () => {
     manualPagination: true,
     manualSorting: true,
     muiTableBodyRowProps: ({ row }) => ({
-      onClick: () => setSelectedUser(row.original),
+      onClick: () => {
+        navigate(`/users/${row.original.id}`);
+        setSelectedUser(row.original);
+      },
       sx: {
         cursor: 'pointer',
         '&:hover': {
@@ -114,7 +131,10 @@ const Example = () => {
       <MaterialReactTable table={table} />
       <UserDetailsForm 
         open={!!selectedUser} 
-        onClose={() => setSelectedUser(null)} 
+        onClose={() => {
+          setSelectedUser(null);
+          navigate('/users');
+        }} 
         user={selectedUser} 
       />
     </PageContainer>
