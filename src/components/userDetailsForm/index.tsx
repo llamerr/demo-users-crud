@@ -1,15 +1,15 @@
-import React from 'react';
+import CloseIcon from '@mui/icons-material/Close';
 import {
-  Modal,
   Box,
-  Typography,
-  TextField,
   Button,
-  Paper,
   Divider,
   IconButton,
+  Modal,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import React from 'react';
 
 interface UserDetailsFormProps {
   open: boolean;

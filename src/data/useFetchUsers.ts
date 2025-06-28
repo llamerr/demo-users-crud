@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { User } from '../types/json-placeholder-data';
-import { MRT_ColumnFiltersState, MRT_SortingState } from 'material-react-table';
+import { type MRT_ColumnFiltersState, type MRT_SortingState } from 'material-react-table';
+import { useMemo, useState } from 'react';
+
+import type { User } from '../types/json-placeholder-data';
 import { API_URL, BROKEN_API_URL } from './api';
 
 export function useFetchUsers() {
