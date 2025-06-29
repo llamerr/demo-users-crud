@@ -1,4 +1,4 @@
-import './users.css';
+import './favoriteUsers.css';
 
 import {
   Delete as DeleteIcon,
@@ -57,7 +57,7 @@ const columnsSettings: MRT_ColumnDef<User>[] = [
 const FavoriteUsersPage = () => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
 
   const {
     favorites,
@@ -69,22 +69,54 @@ const FavoriteUsersPage = () => {
     isFavorite,
   } = useFavoriteUsers();
 
-  useEffect(() => {
-    if (userId) {
-      const user = favorites?.find((user) => user.id === Number(userId));
-      setSelectedUser(user || null);
-    }
-  }, [userId, favorites]);
+  const handleViewUser = useCallback((userId: number) => {
+    navigate(`/favorite-users/${userId}`);
+  }, [navigate]);
+
+  const handleCloseUserDetails = useCallback(() => {
+    navigate('/favorite-users');
+  }, [navigate]);
+
+  const handleSaveUser = useCallback((updatedUser: User) => {
+    // In a real app, you would update the user data here
+    console.log('Saving user:', updatedUser);
+    // For now, just close the dialog
+    handleCloseUserDetails();
+  }, [handleCloseUserDetails]);
 
   const columns = useMemo<MRT_ColumnDef<User>[]>(
-    () => columnsSettings,
-    []
+    () => [
+      ...columnsSettings,
+      {
+        id: 'actions',
+        header: 'Actions',
+        size: 120,
+        enableColumnFilter: false,
+        enableSorting: false,
+        Cell: ({ row }) => (
+          <Box sx={{ display: 'flex', gap: '8px' }} className="mrt-row-actions">
+            <Tooltip title="View details">
+              <IconButton
+                color="primary"
+                onClick={() => handleViewUser(row.original.id)}
+              >
+                <EyeIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Remove from favorites">
+              <IconButton
+                color="error"
+                onClick={() => toggleFavorite(row.original.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ),
+      },
+    ],
+    [handleViewUser, toggleFavorite]
   );
-
-  const handleDelete = useCallback((row: any) => {
-    // Remove from favorites instead of deleting
-    toggleFavorite(row.original.id);
-  }, [toggleFavorite]);
 
   const table = useMaterialReactTable({
     columns,
@@ -100,37 +132,17 @@ const FavoriteUsersPage = () => {
         }
       : undefined,
     renderTopToolbarCustomActions: () => (
-      <Tooltip arrow title="Refresh Favorites">
-        <IconButton onClick={() => refetchFavorites()}>
-          <RefreshIcon />
-        </IconButton>
-      </Tooltip>
-    ),
-    enableRowActions: true,
-    positionActionsColumn: 'last',
-    renderRowActions: ({ row, table }) => (
-      <Box className="mrt-row-actions" sx={{ display: 'inline-flex', gap: '8px' }}>
-        <IconButton
-          color="primary"
-          onClick={() => {
-            navigate(`/favorite-users/${row.original.id}`);
-            setSelectedUser(row.original);
-          }}
-        >
-          <EyeIcon />
-        </IconButton>
-        <IconButton
-          color="error"
-          onClick={() => handleDelete(row)}
-        >
-          <DeleteIcon />
-        </IconButton>
+      <Box>
+        <Tooltip title="Refresh">
+          <IconButton onClick={() => refetchFavorites()}>
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
     ),
     state: {
       isLoading,
       showAlertBanner: isError,
-      showProgressBars: isLoading,
     },
   });
 
@@ -139,16 +151,15 @@ const FavoriteUsersPage = () => {
       <Box sx={{ width: '100%' }} className="mrt-table">
         <MaterialReactTable table={table} />
       </Box>
-      {selectedUser && (
-        <UserDetailsForm 
-          open={!!selectedUser} 
-          onClose={() => {
-            setSelectedUser(null);
-            navigate('/favorite-users');
-          }} 
-          user={selectedUser} 
-        />
-      )}
+      
+      {/* User Details Dialog */}
+      <UserDetailsForm
+        open={!!userId}
+        onClose={handleCloseUserDetails}
+        userId={userId ? parseInt(userId, 10) : undefined}
+        readOnly={true}
+        onSave={handleSaveUser}
+      />
     </PageContainer>
   );
 };

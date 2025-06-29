@@ -63,14 +63,15 @@ const UsersPage = () => {
   const { userId } = useParams<{ userId: string }>();
   const { isFavorite, toggleFavorite } = useFavoriteUsers();
 
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  const [viewingUserId, setViewingUserId] = useState<number | null>(null);
 
   const { 
     data, 
     isError, 
     isRefetching, 
     isLoading, 
-    refetch, 
+    refetch,
     columnFilters, 
     setColumnFilters, 
     globalFilter, 
@@ -86,12 +87,38 @@ const UsersPage = () => {
     toggleFavorite(userId);
   }, [toggleFavorite]);
 
+  const handleViewUser = useCallback((userId: number) => {
+    setViewingUserId(userId);
+    navigate(`/users/${userId}`);
+  }, [navigate]);
+
+  const handleEditUser = useCallback((userId: number) => {
+    setEditingUserId(userId);
+  }, []);
+
+  const handleCloseDetails = useCallback(() => {
+    setViewingUserId(null);
+    navigate('/users');
+  }, [navigate]);
+
+  const handleCloseEdit = useCallback(() => {
+    setEditingUserId(null);
+  }, []);
+
+  const handleSaveUser = useCallback((updatedUser: User) => {
+    // In a real app, you would update the user data here
+    console.log('Updated user:', updatedUser);
+    setEditingUserId(null);
+  }, []);
+
+  // Update URL when viewing user
   useEffect(() => {
     if (userId) {
-      const user = data?.find((user) => user.id === Number(userId));
-      setSelectedUser(user || null);
+      setViewingUserId(Number(userId));
+    } else {
+      setViewingUserId(null);
     }
-  }, [userId, data]);
+  }, [userId]);
 
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => columnsSettings,
@@ -127,15 +154,12 @@ const UsersPage = () => {
     ),
     enableRowActions: true,
     positionActionsColumn: 'last',
-    renderRowActions: ({ row, table }) => (
+    renderRowActions: ({ row }) => (
       <Box className="mrt-row-actions" sx={{ display: 'inline-flex', gap: '8px' }}>
         <Tooltip title="View details">
           <IconButton
             color="primary"
-            onClick={() => {
-              navigate(`/users/${row.original.id}`);
-              setSelectedUser(row.original);
-            }}
+            onClick={() => handleViewUser(row.original.id)}
           >
             <EyeIcon />
           </IconButton>
@@ -143,9 +167,7 @@ const UsersPage = () => {
         <Tooltip title="Edit user">
           <IconButton
             color="secondary"
-            onClick={() => {
-              table.setEditingRow(row);
-            }}
+            onClick={() => handleEditUser(row.original.id)}
           >
             <EditIcon />
           </IconButton>
@@ -154,8 +176,8 @@ const UsersPage = () => {
           <IconButton
             color="error"
             onClick={() => {
-              data.splice(row.index, 1);
-              setData([...data]);
+              // Handle delete
+              console.log('Delete user:', row.original.id);
             }}
           >
             <DeleteIcon />
@@ -186,14 +208,27 @@ const UsersPage = () => {
       <Box sx={{ width: '100%' }} className="mrt-table">
         <MaterialReactTable table={table} />
       </Box>
-      <UserDetailsForm 
-        open={!!selectedUser} 
-        onClose={() => {
-          setSelectedUser(null);
-          navigate('/users');
-        }} 
-        user={selectedUser} 
-      />
+      
+      {/* View User Dialog */}
+      {viewingUserId && (
+        <UserDetailsForm
+          open={!!viewingUserId}
+          onClose={handleCloseDetails}
+          userId={viewingUserId}
+          readOnly
+        />
+      )}
+
+      {/* Edit User Dialog */}
+      {editingUserId && (
+        <UserDetailsForm
+          open={!!editingUserId}
+          onClose={handleCloseEdit}
+          userId={editingUserId}
+          onSave={handleSaveUser}
+          readOnly={false}
+        />
+      )}
     </PageContainer>
   );
 };

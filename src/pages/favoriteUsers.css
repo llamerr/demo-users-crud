@@ -1,0 +1,8 @@
+.mrt-table {
+  .MuiPaper-root, .MuiBox-root, .MuiTableRow-root {
+    background-color: var(--mui-palette-background-default) !important;  
+  }
+  .mrt-row-actions {
+    background-color: transparent !important;
+  }
+}
