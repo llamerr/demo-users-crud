@@ -1,5 +1,6 @@
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { Outlet } from 'react-router';
@@ -20,6 +21,12 @@ const NAVIGATION: Navigation = [
     title: 'Users',
     icon: <PersonIcon />,
     pattern: 'users{/:userId}*',
+  },
+  {
+    segment: 'favorite-users',
+    title: 'Favorite Users',
+    icon: <PersonSearchIcon />,
+    pattern: 'favorite-users{/:userId}*',
   },
 ];
 
