@@ -4,6 +4,8 @@ import type { Navigation } from '@toolpad/core/AppProvider';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { Outlet } from 'react-router';
 
+import theme from './theme';
+
 const NAVIGATION: Navigation = [
   {
     kind: 'header',
@@ -29,7 +31,7 @@ const BRANDING = {
 export default function App() {
   
   return (
-    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
+    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING} theme={theme}>
       <Outlet />
     </ReactRouterAppProvider>
   );

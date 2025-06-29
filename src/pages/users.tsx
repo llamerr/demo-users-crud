@@ -1,7 +1,8 @@
-import RefreshIcon from '@mui/icons-material/Refresh';
+import './users.css';
 import { Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import {
   MaterialReactTable,
@@ -128,7 +129,9 @@ const Example = () => {
   return (
     <PageContainer>
       <Button onClick={() => setIsBroken(!isBroken)}>{isBroken ? 'Fix' : 'Break'} the data</Button>
-      <MaterialReactTable table={table} />
+      <Box sx={{ width: '100%' }} className="mrt-table">
+        <MaterialReactTable table={table} />
+      </Box>
       <UserDetailsForm 
         open={!!selectedUser} 
         onClose={() => {
