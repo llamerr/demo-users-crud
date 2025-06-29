@@ -1,3 +1,6 @@
+// eslint-disable-next-line
+import { scan } from "react-scan"; // must be imported before React and React DOM
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -11,6 +14,10 @@ import DashboardPage from './pages';
 import FavoriteUsersPage from './pages/favoriteUsers';
 import UsersCrudPage from './pages/users';
 import type { User } from './types/json-placeholder-data';
+
+scan({
+  enabled: true,
+});
 
 const queryClient = new QueryClient();
 
